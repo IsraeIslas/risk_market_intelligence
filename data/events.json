@@ -1,0 +1,12 @@
+[
+    {"name":"Robo de carga","type":"crime","lat":25.6866,"lng":-100.3161,"description":"Corredor Monterrey-NL"},
+    {"name":"Bloqueo carretero","type":"incident","lat":19.4326,"lng":-99.1332,"description":"Afectación logística"},
+    {"name":"Zona industrial segura","type":"investment","lat":20.6597,"lng":-103.3496,"description":"Parque industrial"},
+    {"name":"Presencia criminal","type":"crime","lat":21.0190,"lng":-101.2574,"description":"Actividad CJNG"},
+    {"name":"Interrupción logística","type":"incident","lat":22.1565,"lng":-100.9855,"description":"SLP corredor"},
+    {"name":"Zona de inversión","type":"investment","lat":25.4232,"lng":-101.0053,"description":"Saltillo cluster automotriz"},
+    {"name":"Riesgo carretero","type":"incident","lat":24.0277,"lng":-104.6532,"description":"Durango carretera"},
+    {"name":"Puerto estratégico","type":"investment","lat":19.2000,"lng":-96.1332,"description":"Veracruz logística"},
+    {"name":"Actividad criminal","type":"crime","lat":23.2494,"lng":-106.4111,"description":"Sinaloa región"},
+    {"name":"Nodo logístico","type":"investment","lat":20.5888,"lng":-100.3899,"description":"Querétaro hub"}
+]

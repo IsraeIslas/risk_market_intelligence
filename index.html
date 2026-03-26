@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Strategic Risk Intelligence Mexico</title>
+
+    <!-- CSS principal -->
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- Leaflet CSS (SIEMPRE en head) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+
+<header>
+    <div class="topbar">
+        <h1 id="title">Strategic Risk Intelligence</h1>
+
+        <select id="langSwitcher">
+            <option value="es">ES</option>
+            <option value="en">EN</option>
+            <option value="zh">中文</option>
+        </select>
+    </div>
+
+    <p id="subtitle">Security, logistics risk & market entry in Mexico</p>
+</header>
+
+<!-- HERO -->
+<section class="hero small-hero">
+
+    <h2 id="heroTitle">
+        Reduce exposure. Protect operations.
+    </h2>
+
+    <p id="heroText">
+        We help global companies operate safely in Mexico
+    </p>
+
+    <div class="hero-actions">
+
+        <a href="https://www.linkedin.com/in/israirib/" target="_blank" class="btn secondary">
+            LinkedIn
+        </a>
+
+        <a href="https://wa.me/525631719712?text=Hola!%20Me%20gustaría%20recibir%20más%20información." target="_blank" class="btn primary">
+            WhatsApp
+        </a>
+
+        <a href="https://drive.google.com/file/d/15qN_re_dZYTlmSgJaqM-o_Qq1tmF24eD/view?usp=drive_link" target="_blank" class="btn secondary">
+            CV
+        </a>
+
+    </div>
+
+</section>
+
+<!-- MAPA DE RIESGO -->
+<section class="dashboard">
+
+    <!-- MAPA PRINCIPAL -->
+    <div class="panel">
+        <h2>National Risk and Investment Map</h2>
+        <p>Dynamic visualization of criminal risk and investment environment across Mexico</p>
+        <div id="map"></div>
+    </div>
+
+    <!-- MAPA AMAI -->
+<div class="panel map-secondary">
+    <h2>Market Segmentation Intelligence (AMAI)</h2>
+    <p>Socioeconomic distribution analysis for market entry, demand targeting, and investment strategy</p>
+
+    <iframe src="/amai/index.html"></iframe>
+</div>
+    <!-- MAPA RUTA -->
+    <div class="panel map-secondary">
+        <h2>Municipal Risk Intelligence</h2>
+        <p>Identify high-risk corridors and reduce loss probability</p>
+        <iframe src="/ruta-cdmx-veracruz/index.html"></iframe>
+    </div>
+
+    <!-- TRAFFIC -->
+    <div class="panel">
+        <h2>Live Traffic Updates</h2>
+        <p>Real time highway conditions</p>
+        <div class="browser-box">
+            <iframe src="https://nitter.net/CAPUFE?cursor="></iframe>
+        </div>
+    </div>
+
+    <!-- NEWS -->
+    <div class="panel">
+        <h2>Business Intelligence</h2>
+        <p>Investment, logistics & risk signals</p>
+        <div id="news"></div>
+    </div>
+
+</section>
+
+<!-- VALUE -->
+<section class="value">
+    <h2 id="valueTitle">Risk Reduction Capabilities</h2>
+
+    <div class="grid">
+        <div class="card">
+            <h3>Cargo Theft Exposure</h3>
+            <p>Identify high-risk corridors and reduce loss probability</p>
+        </div>
+
+        <div class="card">
+            <h3>Municipal Risk Intelligence</h3>
+            <p>Detect criminal presence and operational threats</p>
+        </div>
+
+        <div class="card">
+            <h3>Industrial Site Risk</h3>
+            <p>Evaluate security before investment decisions</p>
+        </div>
+
+        <div class="card">
+            <h3>Market Entry Risk</h3>
+            <p>Understand regulatory, security and local dynamics</p>
+        </div>
+    </div>
+</section>
+
+<!-- ========================= -->
+<!-- SCRIPTS (ORDEN CORRECTO) -->
+<!-- ========================= -->
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<!-- Tu mapa -->
+<script src="js/map.js"></script>
+
+<!-- Lógica -->
+<script src="data/translations.js"></script>
+<script src="js/script.js"></script>
+<script src="js/scoring.js"></script>
+<script src="js/script.js"></script>
+<script src="js/scoring.js"></script>
+<script src="js/map.js"></script>
+<script src="js/news.js"></script>
+<!-- Twitter widget -->
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+</body>
+</html>

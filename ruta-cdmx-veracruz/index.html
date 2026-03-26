@@ -1,0 +1,1070 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
+        <link rel="stylesheet" href="css/qgis2web.css">
+        <link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/filter.css">
+<link rel="stylesheet" href="css/nouislider.min.css">
+        <link rel="stylesheet" href="css/leaflet.photon.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/L.Control.Layers.Tree.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet.photon.js"></script>
+        <script src="js/tailDT.js"></script>
+<script src="js/nouislider.min.js"></script>
+<script src="js/wNumb.js"></script>
+        <script src="data/Estados_1.js"></script>
+        <script src="data/Conteomunicipal_2.js"></script>
+        <script src="data/Conteoenruta_3.js"></script>
+        <script src="data/Incidencia_4.js"></script>
+        <script src="data/Ruta_5.js"></script>
+        <script>
+        var map = L.map('map', {
+            zoomControl:false, maxZoom:28, minZoom:1
+        }).fitBounds([[17.424109080723067,-99.70821760564979],[20.94313477104424,-95.49686172254452]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        // remove popup's row if "visible-with-data"
+        function removeEmptyRowsFromPopupContent(content, feature) {
+         var tempDiv = document.createElement('div');
+         tempDiv.innerHTML = content;
+         var rows = tempDiv.querySelectorAll('tr');
+         for (var i = 0; i < rows.length; i++) {
+             var td = rows[i].querySelector('td.visible-with-data');
+             var key = td ? td.id : '';
+             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                 rows[i].parentNode.removeChild(rows[i]);
+             }
+         }
+         return tempDiv.innerHTML;
+        }
+        // modify popup if contains media
+        function addClassToPopupIfMedia(content, popup) {
+            var tempDiv = document.createElement('div');
+            tempDiv.innerHTML = content;
+            var imgTd = tempDiv.querySelector('td img');
+            if (imgTd) {
+                var src = imgTd.getAttribute('src');
+                if (/\.(jpg|jpeg|png|gif|bmp|webp|avif)$/i.test(src)) {
+                    popup._contentNode.classList.add('media');
+                    setTimeout(function() {
+                        popup.update();
+                    }, 10);
+                } else if (/\.(mp3|wav|ogg|aac)$/i.test(src)) {
+                    var audio = document.createElement('audio');
+                    audio.controls = true;
+                    audio.src = src;
+                    imgTd.parentNode.replaceChild(audio, imgTd);
+                    popup._contentNode.classList.add('media');
+                    setTimeout(function() {
+                        popup.setContent(tempDiv.innerHTML);
+                        popup.update();
+                    }, 10);
+                } else if (/\.(mp4|webm|ogg|mov)$/i.test(src)) {
+                    var video = document.createElement('video');
+                    video.controls = true;
+                    video.src = src;
+                    video.style.width = "400px";
+                    video.style.height = "300px";
+                    video.style.maxHeight = "60vh";
+                    video.style.maxWidth = "60vw";
+                    imgTd.parentNode.replaceChild(video, imgTd);
+                    popup._contentNode.classList.add('media');
+                    // Aggiorna il popup quando il video carica i metadati
+                    video.addEventListener('loadedmetadata', function() {
+                        popup.update();
+                    });
+                    setTimeout(function() {
+                        popup.setContent(tempDiv.innerHTML);
+                        popup.update();
+                    }, 10);
+                } else {
+                    popup._contentNode.classList.remove('media');
+                }
+            } else {
+                popup._contentNode.classList.remove('media');
+            }
+        }
+        var zoomControl = L.control.zoom({
+            position: 'topleft'
+        }).addTo(map);
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        map.createPane('pane_GoogleMaps_0');
+        map.getPane('pane_GoogleMaps_0').style.zIndex = 400;
+        var layer_GoogleMaps_0 = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+            pane: 'pane_GoogleMaps_0',
+            opacity: 1.0,
+            attribution: '',
+            minZoom: 1,
+            maxZoom: 28,
+        });
+        layer_GoogleMaps_0;
+        map.addLayer(layer_GoogleMaps_0);
+        function pop_Estados_1(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2"><strong>NOMGEO</strong><br />' + (feature.properties['NOMGEO'] !== null ? autolinker.link(String(feature.properties['NOMGEO']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Estados_1_0() {
+            return {
+                pane: 'pane_Estados_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 3.0, 
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Estados_1');
+        map.getPane('pane_Estados_1').style.zIndex = 401;
+        map.getPane('pane_Estados_1').style['mix-blend-mode'] = 'normal';
+        var layer_Estados_1 = new L.geoJson(json_Estados_1, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Estados_1',
+            layerName: 'layer_Estados_1',
+            pane: 'pane_Estados_1',
+            onEachFeature: pop_Estados_1,
+            style: style_Estados_1_0,
+        });
+        bounds_group.addLayer(layer_Estados_1);
+        map.addLayer(layer_Estados_1);
+        function pop_Conteomunicipal_2(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2"><strong>NOMGEO</strong><br />' + (feature.properties['NOMGEO'] !== null ? autolinker.link(String(feature.properties['NOMGEO']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>NOM_ENT</strong><br />' + (feature.properties['NOM_ENT'] !== null ? autolinker.link(String(feature.properties['NOM_ENT']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>conteo</strong><br />' + (feature.properties['conteo'] !== null ? autolinker.link(String(feature.properties['conteo']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Conteomunicipal_2_0(feature) {
+            if (feature.properties['conteo'] >= 0.000000 && feature.properties['conteo'] <= 1.000000 ) {
+                return {
+                pane: 'pane_Conteomunicipal_2',
+                stroke: false, 
+                fillOpacity: 0,
+                interactive: true,
+            }
+            }
+            if (feature.properties['conteo'] >= 1.000000 && feature.properties['conteo'] <= 6.000000 ) {
+                return {
+                pane: 'pane_Conteomunicipal_2',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(253,214,196,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['conteo'] >= 6.000000 && feature.properties['conteo'] <= 14.000000 ) {
+                return {
+                pane: 'pane_Conteomunicipal_2',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(252,164,134,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['conteo'] >= 14.000000 && feature.properties['conteo'] <= 29.000000 ) {
+                return {
+                pane: 'pane_Conteomunicipal_2',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(251,112,80,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['conteo'] >= 29.000000 && feature.properties['conteo'] <= 43.000000 ) {
+                return {
+                pane: 'pane_Conteomunicipal_2',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(234,55,42,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['conteo'] >= 43.000000 && feature.properties['conteo'] <= 69.000000 ) {
+                return {
+                pane: 'pane_Conteomunicipal_2',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(186,20,25,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['conteo'] >= 69.000000 && feature.properties['conteo'] <= 110.000000 ) {
+                return {
+                pane: 'pane_Conteomunicipal_2',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(103,0,13,1.0)',
+                interactive: true,
+            }
+            }
+        }
+        map.createPane('pane_Conteomunicipal_2');
+        map.getPane('pane_Conteomunicipal_2').style.zIndex = 402;
+        map.getPane('pane_Conteomunicipal_2').style['mix-blend-mode'] = 'normal';
+        var layer_Conteomunicipal_2 = new L.geoJson(json_Conteomunicipal_2, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Conteomunicipal_2',
+            layerName: 'layer_Conteomunicipal_2',
+            pane: 'pane_Conteomunicipal_2',
+            onEachFeature: pop_Conteomunicipal_2,
+            style: style_Conteomunicipal_2_0,
+        });
+        bounds_group.addLayer(layer_Conteomunicipal_2);
+        map.addLayer(layer_Conteomunicipal_2);
+        function pop_Conteoenruta_3(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2"><strong>conteo</strong><br />' + (feature.properties['conteo'] !== null ? autolinker.link(String(feature.properties['conteo']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Conteoenruta_3_0(feature) {
+            if (feature.properties['conteo'] >= 0.000000 && feature.properties['conteo'] <= 0.000000 ) {
+                return {
+                pane: 'pane_Conteoenruta_3',
+                stroke: false, 
+                fillOpacity: 0,
+                interactive: true,
+            }
+            }
+            if (feature.properties['conteo'] >= 0.000000 && feature.properties['conteo'] <= 1.000000 ) {
+                return {
+                pane: 'pane_Conteoenruta_3',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(253,214,196,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['conteo'] >= 1.000000 && feature.properties['conteo'] <= 3.000000 ) {
+                return {
+                pane: 'pane_Conteoenruta_3',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(252,164,134,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['conteo'] >= 3.000000 && feature.properties['conteo'] <= 5.000000 ) {
+                return {
+                pane: 'pane_Conteoenruta_3',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(251,112,80,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['conteo'] >= 5.000000 && feature.properties['conteo'] <= 7.000000 ) {
+                return {
+                pane: 'pane_Conteoenruta_3',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(234,55,42,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['conteo'] >= 7.000000 && feature.properties['conteo'] <= 20.000000 ) {
+                return {
+                pane: 'pane_Conteoenruta_3',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(186,20,25,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['conteo'] >= 20.000000 && feature.properties['conteo'] <= 24.000000 ) {
+                return {
+                pane: 'pane_Conteoenruta_3',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(103,0,13,1.0)',
+                interactive: true,
+            }
+            }
+        }
+        map.createPane('pane_Conteoenruta_3');
+        map.getPane('pane_Conteoenruta_3').style.zIndex = 403;
+        map.getPane('pane_Conteoenruta_3').style['mix-blend-mode'] = 'normal';
+        var layer_Conteoenruta_3 = new L.geoJson(json_Conteoenruta_3, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Conteoenruta_3',
+            layerName: 'layer_Conteoenruta_3',
+            pane: 'pane_Conteoenruta_3',
+            onEachFeature: pop_Conteoenruta_3,
+            style: style_Conteoenruta_3_0,
+        });
+        bounds_group.addLayer(layer_Conteoenruta_3);
+        map.addLayer(layer_Conteoenruta_3);
+        function pop_Incidencia_4(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2"><strong>fuente</strong><br />' + (feature.properties['fuente'] !== null ? autolinker.link(String(feature.properties['fuente']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>enlace</strong><br />' + (feature.properties['enlace'] !== null ? autolinker.link(String(feature.properties['enlace']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>fecha</strong><br />' + (feature.properties['fecha'] !== null ? autolinker.link(String(feature.properties['fecha']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>contenido</strong><br />' + (feature.properties['contenido'] !== null ? autolinker.link(String(feature.properties['contenido']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>titulo</strong><br />' + (feature.properties['titulo'] !== null ? autolinker.link(String(feature.properties['titulo']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>categoria_predicha</strong><br />' + (feature.properties['categoria_predicha'] !== null ? autolinker.link(String(feature.properties['categoria_predicha']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Incidencia_4_0(feature) {
+            switch(String(feature.properties['categoria_predicha'])) {
+                case 'Ataque con armas de fuego':
+                    return {
+                pane: 'pane_Incidencia_4',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(237,189,122,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Confrontación contra autoridades':
+                    return {
+                pane: 'pane_Incidencia_4',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(119,201,96,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Enfrentamiento entre grupos delictivos':
+                    return {
+                pane: 'pane_Incidencia_4',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(36,218,212,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Homicidio con arma de fuego':
+                    return {
+                pane: 'pane_Incidencia_4',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(56,226,121,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Operativo':
+                    return {
+                pane: 'pane_Incidencia_4',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(192,85,225,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Robo a establecimiento':
+                    return {
+                pane: 'pane_Incidencia_4',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(196,217,100,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Robo a transporte':
+                    return {
+                pane: 'pane_Incidencia_4',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(56,118,200,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Robo de vehículo':
+                    return {
+                pane: 'pane_Incidencia_4',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(217,39,42,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Secuestro':
+                    return {
+                pane: 'pane_Incidencia_4',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(73,44,220,1.0)',
+                interactive: true,
+            }
+                    break;
+                default:
+                    return {
+                pane: 'pane_Incidencia_4',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(235,100,185,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_Incidencia_4');
+        map.getPane('pane_Incidencia_4').style.zIndex = 404;
+        map.getPane('pane_Incidencia_4').style['mix-blend-mode'] = 'normal';
+        var layer_Incidencia_4 = new L.geoJson(json_Incidencia_4, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Incidencia_4',
+            layerName: 'layer_Incidencia_4',
+            pane: 'pane_Incidencia_4',
+            onEachFeature: pop_Incidencia_4,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_Incidencia_4_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Incidencia_4);
+        map.addLayer(layer_Incidencia_4);
+        function pop_Ruta_5(feature, layer) {
+            var popupContent = '<table>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Ruta_5_0() {
+            return {
+                pane: 'pane_Ruta_5',
+                opacity: 1,
+                color: 'rgba(34,50,236,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Ruta_5');
+        map.getPane('pane_Ruta_5').style.zIndex = 405;
+        map.getPane('pane_Ruta_5').style['mix-blend-mode'] = 'normal';
+        var layer_Ruta_5 = new L.geoJson(json_Ruta_5, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Ruta_5',
+            layerName: 'layer_Ruta_5',
+            pane: 'pane_Ruta_5',
+            onEachFeature: pop_Ruta_5,
+            style: style_Ruta_5_0,
+        });
+        bounds_group.addLayer(layer_Ruta_5);
+        map.addLayer(layer_Ruta_5);
+        var overlaysTree = [
+            {label: '<img src="legend/Ruta_5.png" /> Ruta', layer: layer_Ruta_5},
+            {label: 'Incidencia<br /><table><tr><td style="text-align: center;"><img src="legend/Incidencia_4_Ataqueconarmasdefuego0.png" /></td><td>Ataque con armas de fuego</td></tr><tr><td style="text-align: center;"><img src="legend/Incidencia_4_Confrontacióncontraautoridades1.png" /></td><td>Confrontación contra autoridades</td></tr><tr><td style="text-align: center;"><img src="legend/Incidencia_4_Enfrentamientoentregruposdelictivos2.png" /></td><td>Enfrentamiento entre grupos delictivos</td></tr><tr><td style="text-align: center;"><img src="legend/Incidencia_4_Homicidioconarmadefuego3.png" /></td><td>Homicidio con arma de fuego</td></tr><tr><td style="text-align: center;"><img src="legend/Incidencia_4_Operativo4.png" /></td><td>Operativo</td></tr><tr><td style="text-align: center;"><img src="legend/Incidencia_4_Roboaestablecimiento5.png" /></td><td>Robo a establecimiento</td></tr><tr><td style="text-align: center;"><img src="legend/Incidencia_4_Roboatransporte6.png" /></td><td>Robo a transporte</td></tr><tr><td style="text-align: center;"><img src="legend/Incidencia_4_Robodevehículo7.png" /></td><td>Robo de vehículo</td></tr><tr><td style="text-align: center;"><img src="legend/Incidencia_4_Secuestro8.png" /></td><td>Secuestro</td></tr><tr><td style="text-align: center;"><img src="legend/Incidencia_4_9.png" /></td><td></td></tr></table>', layer: layer_Incidencia_4},
+            {label: 'Conteo en ruta<br /><table><tr><td style="text-align: center;"><img src="legend/Conteoenruta_3_000.png" /></td><td>0 - 0</td></tr><tr><td style="text-align: center;"><img src="legend/Conteoenruta_3_011.png" /></td><td>0 - 1</td></tr><tr><td style="text-align: center;"><img src="legend/Conteoenruta_3_132.png" /></td><td>1 - 3</td></tr><tr><td style="text-align: center;"><img src="legend/Conteoenruta_3_353.png" /></td><td>3 - 5</td></tr><tr><td style="text-align: center;"><img src="legend/Conteoenruta_3_574.png" /></td><td>5 - 7</td></tr><tr><td style="text-align: center;"><img src="legend/Conteoenruta_3_7205.png" /></td><td>7 - 20</td></tr><tr><td style="text-align: center;"><img src="legend/Conteoenruta_3_20246.png" /></td><td>20 - 24</td></tr></table>', layer: layer_Conteoenruta_3},
+            {label: 'Conteo municipal<br /><table><tr><td style="text-align: center;"><img src="legend/Conteomunicipal_2_010.png" /></td><td>0 - 1</td></tr><tr><td style="text-align: center;"><img src="legend/Conteomunicipal_2_161.png" /></td><td>1 - 6</td></tr><tr><td style="text-align: center;"><img src="legend/Conteomunicipal_2_6142.png" /></td><td>6 - 14</td></tr><tr><td style="text-align: center;"><img src="legend/Conteomunicipal_2_14293.png" /></td><td>14 - 29</td></tr><tr><td style="text-align: center;"><img src="legend/Conteomunicipal_2_29434.png" /></td><td>29 - 43</td></tr><tr><td style="text-align: center;"><img src="legend/Conteomunicipal_2_43695.png" /></td><td>43 - 69</td></tr><tr><td style="text-align: center;"><img src="legend/Conteomunicipal_2_691106.png" /></td><td>69 - 110</td></tr></table>', layer: layer_Conteomunicipal_2},
+            {label: '<img src="legend/Estados_1.png" /> Estados', layer: layer_Estados_1},
+            {label: "Google Maps", layer: layer_GoogleMaps_0},]
+        var lay = L.control.layers.tree(null, overlaysTree,{
+            //namedToggle: true,
+            //selectorBack: false,
+            //closedSymbol: '&#8862; &#x1f5c0;',
+            //openedSymbol: '&#8863; &#x1f5c1;',
+            //collapseAll: 'Collapse all',
+            //expandAll: 'Expand all',
+            collapsed: false, 
+        });
+        lay.addTo(map);
+		document.addEventListener("DOMContentLoaded", function() {
+            // set new Layers List height which considers toggle icon
+            function newLayersListHeight() {
+                var layerScrollbarElement = document.querySelector('.leaflet-control-layers-scrollbar');
+                if (layerScrollbarElement) {
+                    var layersListElement = document.querySelector('.leaflet-control-layers-list');
+                    var originalHeight = layersListElement.style.height 
+                        || window.getComputedStyle(layersListElement).height;
+                    var newHeight = parseFloat(originalHeight) - 50;
+                    layersListElement.style.height = newHeight + 'px';
+                }
+            }
+            var isLayersListExpanded = true;
+            var controlLayersElement = document.querySelector('.leaflet-control-layers');
+            var toggleLayerControl = document.querySelector('.leaflet-control-layers-toggle');
+            // toggle Collapsed/Expanded and apply new Layers List height
+            toggleLayerControl.addEventListener('click', function() {
+                if (isLayersListExpanded) {
+                    controlLayersElement.classList.remove('leaflet-control-layers-expanded');
+                } else {
+                    controlLayersElement.classList.add('leaflet-control-layers-expanded');
+                }
+                isLayersListExpanded = !isLayersListExpanded;
+                newLayersListHeight()
+            });	
+			// apply new Layers List height if toggle layerstree
+			if (controlLayersElement) {
+				controlLayersElement.addEventListener('click', function(event) {
+					var toggleLayerHeaderPointer = event.target.closest('.leaflet-layerstree-header-pointer span');
+					if (toggleLayerHeaderPointer) {
+						newLayersListHeight();
+					}
+				});
+			}
+            // Collapsed/Expanded at Start to apply new height
+            setTimeout(function() {
+                toggleLayerControl.click();
+            }, 10);
+            setTimeout(function() {
+                toggleLayerControl.click();
+            }, 10);
+            // Collapsed touch/small screen
+            var isSmallScreen = window.innerWidth < 150;
+            if (isSmallScreen) {
+                setTimeout(function() {
+                    controlLayersElement.classList.remove('leaflet-control-layers-expanded');
+                    isLayersListExpanded = !isLayersListExpanded;
+                }, 500);
+            }  
+        });       
+        setBounds();
+        var i = 0;
+        layer_Estados_1.eachLayer(function(layer) {
+            var context = {
+                feature: layer.feature,
+                variables: {}
+            };
+            layer.bindTooltip((layer.feature.properties['NOMGEO'] !== null?String('<div style="color: #ffffff; font-size: 10pt; font-family: \'Open Sans\', sans-serif;">' + layer.feature.properties['NOMGEO']) + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_Estados_1'});
+            labels.push(layer);
+            totalMarkers += 1;
+              layer.added = true;
+              addLabel(layer, i);
+              i++;
+        });
+        var mapDiv = document.getElementById('map');
+        var row = document.createElement('div');
+        row.className="row";
+        row.id="all";
+        row.style.height = "100%";
+        var col1 = document.createElement('div');
+        col1.className="col9";
+        col1.id = "mapWindow";
+        col1.style.height = "99%";
+        col1.style.width = "80%";
+        col1.style.display = "inline-block";
+        var col2 = document.createElement('div');
+        col2.className="col3";
+        col2.id = "menu";
+        col2.style.display = "inline-block";
+        mapDiv.parentNode.insertBefore(row, mapDiv);
+        document.getElementById("all").appendChild(col1);
+        document.getElementById("all").appendChild(col2);
+        col1.appendChild(mapDiv)
+        var Filters = {"categoria_predicha": "str","fecha": "str"};
+        function filterFunc() {
+          map.eachLayer(function(lyr){
+          if ("options" in lyr && "dataVar" in lyr["options"]){
+            features = this[lyr["options"]["dataVar"]].features.slice(0);
+            try{
+              for (key in Filters){
+                keyS = key.replace(/[^a-zA-Z0-9_]/g, "")
+                if (Filters[key] == "str" || Filters[key] == "bool"){
+                  var selection = [];
+                  var options = document.getElementById("sel_" + keyS).options
+                  for (var i=0; i < options.length; i++) {
+                    if (options[i].selected) selection.push(options[i].value);
+                  }
+                    try{
+                      if (key in features[0].properties){
+                        for (i = features.length - 1;
+                          i >= 0; --i){
+                          if (selection.indexOf(
+                          features[i].properties[key])<0
+                          && selection.length>0) {
+                          features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                  }
+                }
+                if (Filters[key] == "int"){
+                  sliderVals =  document.getElementById(
+                    "div_" + keyS).noUiSlider.get();
+                  try{
+                    if (key in features[0].properties){
+                    for (i = features.length - 1; i >= 0; --i){
+                      if (parseInt(features[i].properties[key])
+                          < sliderVals[0]
+                          || parseInt(features[i].properties[key])
+                          > sliderVals[1]){
+                            features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                    }
+                  }
+                if (Filters[key] == "real"){
+                  sliderVals =  document.getElementById(
+                    "div_" + keyS).noUiSlider.get();
+                  try{
+                    if (key in features[0].properties){
+                    for (i = features.length - 1; i >= 0; --i){
+                      if (features[i].properties[key]
+                          < sliderVals[0]
+                          || features[i].properties[key]
+                          > sliderVals[1]){
+                            features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                    }
+                  }
+                if (Filters[key] == "date"
+                  || Filters[key] == "datetime"
+                  || Filters[key] == "time"){
+                  try{
+                    if (key in features[0].properties){
+                      HTMLkey = key.replace(/[&\/\\#,+()$~%.'":*?<>{} ]/g, '');
+                      startdate = document.getElementById("dat_" +
+                        HTMLkey + "_date1").value.replace(" ", "T");
+                      enddate = document.getElementById("dat_" +
+                        HTMLkey + "_date2").value.replace(" ", "T");
+                      for (i = features.length - 1; i >= 0; --i){
+                        if (features[i].properties[key] < startdate
+                          || features[i].properties[key] > enddate){
+                          features.splice(i,1);
+                        }
+                      }
+                    }
+                  } catch(err){
+                  }
+                }
+              }
+            } catch(err){
+            }
+          this[lyr["options"]["layerName"]].clearLayers();
+          this[lyr["options"]["layerName"]].addData(features);
+        var i = 0;
+        layer_Estados_1.eachLayer(function(layer) {
+            var context = {
+                feature: layer.feature,
+                variables: {}
+            };
+            layer.bindTooltip((layer.feature.properties['NOMGEO'] !== null?String('<div style="color: #ffffff; font-size: 10pt; font-family: \'Open Sans\', sans-serif;">' + layer.feature.properties['NOMGEO']) + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_Estados_1'});
+            labels.push(layer);
+            totalMarkers += 1;
+              layer.added = true;
+              addLabel(layer, i);
+              i++;
+        });
+          }
+          })
+        }
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_categoria_predicha = document.createElement('div');
+            div_categoria_predicha.id = "div_categoria_predicha";
+            div_categoria_predicha.className= "filterselect";
+            document.getElementById("menu").appendChild(div_categoria_predicha);
+            sel_categoria_predicha = document.createElement('select');
+            sel_categoria_predicha.multiple = true;
+            sel_categoria_predicha.size = 9;
+            sel_categoria_predicha.id = "sel_categoria_predicha";
+            var categoria_predicha_options_str = "<option value='' unselected></option>";
+            sel_categoria_predicha.onchange = function(){filterFunc()};
+            categoria_predicha_options_str  += '<option value="Ataque con armas de fuego">Ataque con armas de fuego</option>';
+            categoria_predicha_options_str  += '<option value="Confrontación contra autoridades">Confrontación contra autoridades</option>';
+            categoria_predicha_options_str  += '<option value="Enfrentamiento entre grupos delictivos">Enfrentamiento entre grupos delictivos</option>';
+            categoria_predicha_options_str  += '<option value="Homicidio con arma de fuego">Homicidio con arma de fuego</option>';
+            categoria_predicha_options_str  += '<option value="Operativo">Operativo</option>';
+            categoria_predicha_options_str  += '<option value="Robo a establecimiento">Robo a establecimiento</option>';
+            categoria_predicha_options_str  += '<option value="Robo a transporte">Robo a transporte</option>';
+            categoria_predicha_options_str  += '<option value="Robo de vehículo">Robo de vehículo</option>';
+            categoria_predicha_options_str  += '<option value="Secuestro">Secuestro</option>';
+            sel_categoria_predicha.innerHTML = categoria_predicha_options_str;
+            div_categoria_predicha.appendChild(sel_categoria_predicha);
+            var lab_categoria_predicha = document.createElement('div');
+            lab_categoria_predicha.innerHTML = 'categoria_predicha';
+            lab_categoria_predicha.className = 'filterlabel';
+            div_categoria_predicha.appendChild(lab_categoria_predicha);
+            var reset_categoria_predicha = document.createElement('div');
+            reset_categoria_predicha.innerHTML = 'clear filter';
+            reset_categoria_predicha.className = 'filterlabel';
+            reset_categoria_predicha.onclick = function() {
+                var options = document.getElementById("sel_categoria_predicha").options;
+                for (var i=0; i < options.length; i++) {
+                    options[i].selected = false;
+                }
+                filterFunc();
+            };
+            div_categoria_predicha.appendChild(reset_categoria_predicha);
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_fecha = document.createElement('div');
+            div_fecha.id = "div_fecha";
+            div_fecha.className= "filterselect";
+            document.getElementById("menu").appendChild(div_fecha);
+            sel_fecha = document.createElement('select');
+            sel_fecha.multiple = true;
+            sel_fecha.size = 10;
+            sel_fecha.id = "sel_fecha";
+            var fecha_options_str = "<option value='' unselected></option>";
+            sel_fecha.onchange = function(){filterFunc()};
+            fecha_options_str  += '<option value="01/01/2026">01/01/2026</option>';
+            fecha_options_str  += '<option value="01/02/2026">01/02/2026</option>';
+            fecha_options_str  += '<option value="01/03/2026">01/03/2026</option>';
+            fecha_options_str  += '<option value="01/11/2025">01/11/2025</option>';
+            fecha_options_str  += '<option value="01/12/2025">01/12/2025</option>';
+            fecha_options_str  += '<option value="02/01/2026">02/01/2026</option>';
+            fecha_options_str  += '<option value="02/02/2026">02/02/2026</option>';
+            fecha_options_str  += '<option value="02/03/2026">02/03/2026</option>';
+            fecha_options_str  += '<option value="02/11/2025">02/11/2025</option>';
+            fecha_options_str  += '<option value="02/12/2025">02/12/2025</option>';
+            fecha_options_str  += '<option value="03/01/2026">03/01/2026</option>';
+            fecha_options_str  += '<option value="03/02/2026">03/02/2026</option>';
+            fecha_options_str  += '<option value="03/03/2026">03/03/2026</option>';
+            fecha_options_str  += '<option value="03/11/2025">03/11/2025</option>';
+            fecha_options_str  += '<option value="03/12/2025">03/12/2025</option>';
+            fecha_options_str  += '<option value="04/01/2026">04/01/2026</option>';
+            fecha_options_str  += '<option value="04/02/2026">04/02/2026</option>';
+            fecha_options_str  += '<option value="04/03/2026">04/03/2026</option>';
+            fecha_options_str  += '<option value="04/11/2025">04/11/2025</option>';
+            fecha_options_str  += '<option value="04/12/2025">04/12/2025</option>';
+            fecha_options_str  += '<option value="05/01/2026">05/01/2026</option>';
+            fecha_options_str  += '<option value="05/02/2026">05/02/2026</option>';
+            fecha_options_str  += '<option value="05/03/2026">05/03/2026</option>';
+            fecha_options_str  += '<option value="05/11/2025">05/11/2025</option>';
+            fecha_options_str  += '<option value="05/12/2025">05/12/2025</option>';
+            fecha_options_str  += '<option value="06/01/2026">06/01/2026</option>';
+            fecha_options_str  += '<option value="06/02/2026">06/02/2026</option>';
+            fecha_options_str  += '<option value="06/03/2026">06/03/2026</option>';
+            fecha_options_str  += '<option value="06/11/2025">06/11/2025</option>';
+            fecha_options_str  += '<option value="06/12/2025">06/12/2025</option>';
+            fecha_options_str  += '<option value="07/01/2026">07/01/2026</option>';
+            fecha_options_str  += '<option value="07/02/2026">07/02/2026</option>';
+            fecha_options_str  += '<option value="07/03/2026">07/03/2026</option>';
+            fecha_options_str  += '<option value="07/11/2025">07/11/2025</option>';
+            fecha_options_str  += '<option value="07/12/2025">07/12/2025</option>';
+            fecha_options_str  += '<option value="08/01/2026">08/01/2026</option>';
+            fecha_options_str  += '<option value="08/02/2026">08/02/2026</option>';
+            fecha_options_str  += '<option value="08/03/2026">08/03/2026</option>';
+            fecha_options_str  += '<option value="08/11/2025">08/11/2025</option>';
+            fecha_options_str  += '<option value="08/12/2025">08/12/2025</option>';
+            fecha_options_str  += '<option value="09/01/2026">09/01/2026</option>';
+            fecha_options_str  += '<option value="09/02/2026">09/02/2026</option>';
+            fecha_options_str  += '<option value="09/03/2026">09/03/2026</option>';
+            fecha_options_str  += '<option value="09/11/2025">09/11/2025</option>';
+            fecha_options_str  += '<option value="09/12/2025">09/12/2025</option>';
+            fecha_options_str  += '<option value="10/01/2026">10/01/2026</option>';
+            fecha_options_str  += '<option value="10/02/2026">10/02/2026</option>';
+            fecha_options_str  += '<option value="10/03/2026">10/03/2026</option>';
+            fecha_options_str  += '<option value="10/10/2025">10/10/2025</option>';
+            fecha_options_str  += '<option value="10/11/2025">10/11/2025</option>';
+            fecha_options_str  += '<option value="10/12/2025">10/12/2025</option>';
+            fecha_options_str  += '<option value="11/01/2026">11/01/2026</option>';
+            fecha_options_str  += '<option value="11/02/2026">11/02/2026</option>';
+            fecha_options_str  += '<option value="11/03/2026">11/03/2026</option>';
+            fecha_options_str  += '<option value="11/10/2025">11/10/2025</option>';
+            fecha_options_str  += '<option value="11/11/2025">11/11/2025</option>';
+            fecha_options_str  += '<option value="11/12/2025">11/12/2025</option>';
+            fecha_options_str  += '<option value="12/01/2026">12/01/2026</option>';
+            fecha_options_str  += '<option value="12/02/2026">12/02/2026</option>';
+            fecha_options_str  += '<option value="12/03/2026">12/03/2026</option>';
+            fecha_options_str  += '<option value="12/10/2025">12/10/2025</option>';
+            fecha_options_str  += '<option value="12/11/2025">12/11/2025</option>';
+            fecha_options_str  += '<option value="12/12/2025">12/12/2025</option>';
+            fecha_options_str  += '<option value="13/01/2026">13/01/2026</option>';
+            fecha_options_str  += '<option value="13/02/2026">13/02/2026</option>';
+            fecha_options_str  += '<option value="13/03/2026">13/03/2026</option>';
+            fecha_options_str  += '<option value="13/10/2025">13/10/2025</option>';
+            fecha_options_str  += '<option value="13/11/2025">13/11/2025</option>';
+            fecha_options_str  += '<option value="13/12/2025">13/12/2025</option>';
+            fecha_options_str  += '<option value="14/01/2026">14/01/2026</option>';
+            fecha_options_str  += '<option value="14/02/2026">14/02/2026</option>';
+            fecha_options_str  += '<option value="14/03/2026">14/03/2026</option>';
+            fecha_options_str  += '<option value="14/10/2025">14/10/2025</option>';
+            fecha_options_str  += '<option value="14/11/2025">14/11/2025</option>';
+            fecha_options_str  += '<option value="14/12/2025">14/12/2025</option>';
+            fecha_options_str  += '<option value="15/01/2026">15/01/2026</option>';
+            fecha_options_str  += '<option value="15/02/2026">15/02/2026</option>';
+            fecha_options_str  += '<option value="15/03/2026">15/03/2026</option>';
+            fecha_options_str  += '<option value="15/10/2025">15/10/2025</option>';
+            fecha_options_str  += '<option value="15/11/2025">15/11/2025</option>';
+            fecha_options_str  += '<option value="15/12/2025">15/12/2025</option>';
+            fecha_options_str  += '<option value="16/01/2026">16/01/2026</option>';
+            fecha_options_str  += '<option value="16/02/2026">16/02/2026</option>';
+            fecha_options_str  += '<option value="16/03/2026">16/03/2026</option>';
+            fecha_options_str  += '<option value="16/10/2025">16/10/2025</option>';
+            fecha_options_str  += '<option value="16/11/2025">16/11/2025</option>';
+            fecha_options_str  += '<option value="16/12/2025">16/12/2025</option>';
+            fecha_options_str  += '<option value="17/01/2026">17/01/2026</option>';
+            fecha_options_str  += '<option value="17/02/2026">17/02/2026</option>';
+            fecha_options_str  += '<option value="17/03/2026">17/03/2026</option>';
+            fecha_options_str  += '<option value="17/10/2025">17/10/2025</option>';
+            fecha_options_str  += '<option value="17/11/2025">17/11/2025</option>';
+            fecha_options_str  += '<option value="17/12/2025">17/12/2025</option>';
+            fecha_options_str  += '<option value="18/01/2026">18/01/2026</option>';
+            fecha_options_str  += '<option value="18/02/2026">18/02/2026</option>';
+            fecha_options_str  += '<option value="18/03/2026">18/03/2026</option>';
+            fecha_options_str  += '<option value="18/10/2025">18/10/2025</option>';
+            fecha_options_str  += '<option value="18/11/2025">18/11/2025</option>';
+            fecha_options_str  += '<option value="18/12/2025">18/12/2025</option>';
+            fecha_options_str  += '<option value="19/01/2026">19/01/2026</option>';
+            fecha_options_str  += '<option value="19/02/2026">19/02/2026</option>';
+            fecha_options_str  += '<option value="19/03/2026">19/03/2026</option>';
+            fecha_options_str  += '<option value="19/10/2025">19/10/2025</option>';
+            fecha_options_str  += '<option value="19/11/2025">19/11/2025</option>';
+            fecha_options_str  += '<option value="19/12/2025">19/12/2025</option>';
+            fecha_options_str  += '<option value="20/01/2026">20/01/2026</option>';
+            fecha_options_str  += '<option value="20/02/2026">20/02/2026</option>';
+            fecha_options_str  += '<option value="20/03/2026">20/03/2026</option>';
+            fecha_options_str  += '<option value="20/10/2025">20/10/2025</option>';
+            fecha_options_str  += '<option value="20/11/2025">20/11/2025</option>';
+            fecha_options_str  += '<option value="20/12/2025">20/12/2025</option>';
+            fecha_options_str  += '<option value="21/01/2026">21/01/2026</option>';
+            fecha_options_str  += '<option value="21/02/2026">21/02/2026</option>';
+            fecha_options_str  += '<option value="21/03/2026">21/03/2026</option>';
+            fecha_options_str  += '<option value="21/10/2025">21/10/2025</option>';
+            fecha_options_str  += '<option value="21/11/2025">21/11/2025</option>';
+            fecha_options_str  += '<option value="21/12/2025">21/12/2025</option>';
+            fecha_options_str  += '<option value="22/01/2026">22/01/2026</option>';
+            fecha_options_str  += '<option value="22/02/2026">22/02/2026</option>';
+            fecha_options_str  += '<option value="22/03/2026">22/03/2026</option>';
+            fecha_options_str  += '<option value="22/10/2025">22/10/2025</option>';
+            fecha_options_str  += '<option value="22/11/2025">22/11/2025</option>';
+            fecha_options_str  += '<option value="22/12/2025">22/12/2025</option>';
+            fecha_options_str  += '<option value="23/01/2026">23/01/2026</option>';
+            fecha_options_str  += '<option value="23/02/2026">23/02/2026</option>';
+            fecha_options_str  += '<option value="23/03/2026">23/03/2026</option>';
+            fecha_options_str  += '<option value="23/10/2025">23/10/2025</option>';
+            fecha_options_str  += '<option value="23/11/2025">23/11/2025</option>';
+            fecha_options_str  += '<option value="23/12/2025">23/12/2025</option>';
+            fecha_options_str  += '<option value="24/01/2026">24/01/2026</option>';
+            fecha_options_str  += '<option value="24/02/2026">24/02/2026</option>';
+            fecha_options_str  += '<option value="24/03/2026">24/03/2026</option>';
+            fecha_options_str  += '<option value="24/10/2025">24/10/2025</option>';
+            fecha_options_str  += '<option value="24/11/2025">24/11/2025</option>';
+            fecha_options_str  += '<option value="24/12/2025">24/12/2025</option>';
+            fecha_options_str  += '<option value="25/01/2026">25/01/2026</option>';
+            fecha_options_str  += '<option value="25/02/2026">25/02/2026</option>';
+            fecha_options_str  += '<option value="25/10/2025">25/10/2025</option>';
+            fecha_options_str  += '<option value="25/11/2025">25/11/2025</option>';
+            fecha_options_str  += '<option value="25/12/2025">25/12/2025</option>';
+            fecha_options_str  += '<option value="26/01/2026">26/01/2026</option>';
+            fecha_options_str  += '<option value="26/02/2026">26/02/2026</option>';
+            fecha_options_str  += '<option value="26/10/2025">26/10/2025</option>';
+            fecha_options_str  += '<option value="26/11/2025">26/11/2025</option>';
+            fecha_options_str  += '<option value="26/12/2025">26/12/2025</option>';
+            fecha_options_str  += '<option value="27/01/2026">27/01/2026</option>';
+            fecha_options_str  += '<option value="27/02/2026">27/02/2026</option>';
+            fecha_options_str  += '<option value="27/10/2025">27/10/2025</option>';
+            fecha_options_str  += '<option value="27/11/2025">27/11/2025</option>';
+            fecha_options_str  += '<option value="27/12/2025">27/12/2025</option>';
+            fecha_options_str  += '<option value="28/01/2026">28/01/2026</option>';
+            fecha_options_str  += '<option value="28/02/2026">28/02/2026</option>';
+            fecha_options_str  += '<option value="28/10/2025">28/10/2025</option>';
+            fecha_options_str  += '<option value="28/11/2025">28/11/2025</option>';
+            fecha_options_str  += '<option value="28/12/2025">28/12/2025</option>';
+            fecha_options_str  += '<option value="29/01/2026">29/01/2026</option>';
+            fecha_options_str  += '<option value="29/10/2025">29/10/2025</option>';
+            fecha_options_str  += '<option value="29/11/2025">29/11/2025</option>';
+            fecha_options_str  += '<option value="29/12/2025">29/12/2025</option>';
+            fecha_options_str  += '<option value="30/01/2026">30/01/2026</option>';
+            fecha_options_str  += '<option value="30/10/2025">30/10/2025</option>';
+            fecha_options_str  += '<option value="30/11/2025">30/11/2025</option>';
+            fecha_options_str  += '<option value="30/12/2025">30/12/2025</option>';
+            fecha_options_str  += '<option value="31/01/2026">31/01/2026</option>';
+            fecha_options_str  += '<option value="31/10/2025">31/10/2025</option>';
+            fecha_options_str  += '<option value="31/12/2025">31/12/2025</option>';
+            sel_fecha.innerHTML = fecha_options_str;
+            div_fecha.appendChild(sel_fecha);
+            var lab_fecha = document.createElement('div');
+            lab_fecha.innerHTML = 'fecha';
+            lab_fecha.className = 'filterlabel';
+            div_fecha.appendChild(lab_fecha);
+            var reset_fecha = document.createElement('div');
+            reset_fecha.innerHTML = 'clear filter';
+            reset_fecha.className = 'filterlabel';
+            reset_fecha.onclick = function() {
+                var options = document.getElementById("sel_fecha").options;
+                for (var i=0; i < options.length; i++) {
+                    options[i].selected = false;
+                }
+                filterFunc();
+            };
+            div_fecha.appendChild(reset_fecha);
+        resetLabels([layer_Estados_1]);
+        map.on("zoomend", function(){
+            resetLabels([layer_Estados_1]);
+        });
+        map.on("layeradd", function(){
+            resetLabels([layer_Estados_1]);
+        });
+        map.on("layerremove", function(){
+            resetLabels([layer_Estados_1]);
+        });
+        </script>        
+    </body>
+</html>
